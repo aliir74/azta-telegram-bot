@@ -1,7 +1,8 @@
 import { Bot } from "grammy";
+import { TELEGRAM_BOT_TOKEN } from "./environment";
 
 // Create an instance of the `Bot` class and pass your bot token to it.
-const bot = new Bot(""); // <-- put your bot token between the ""
+const bot = new Bot(TELEGRAM_BOT_TOKEN);
 
 // You can now register listeners on your bot object `bot`.
 // grammY will call the listeners when users send messages to your bot.
