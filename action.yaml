@@ -1,0 +1,52 @@
+name: Deploy Azta Telegram Bot
+description: Build and deploy Azta Telegram Bot to a specific VPS
+author: GitHub Actions
+
+inputs:
+  ssh_host:
+    description: 'SSH host of the VPS'
+    required: true
+  ssh_username:
+    description: 'SSH username for the VPS'
+    required: true
+  ssh_private_key:
+    description: 'SSH private key for authentication'
+    required: true
+  docker_image_name:
+    description: 'Name of the Docker image to build and deploy'
+    required: true
+    default: 'azta-telegram-bot'
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v1
+
+    - name: Build Docker image
+      run: |
+        docker buildx create --use
+        docker buildx build --load -t ${{ inputs.docker_image_name }}:latest .
+      shell: bash
+
+    - name: Install SSH client
+      run: sudo apt-get install -y openssh-client
+      shell: bash
+
+    - name: Deploy to VPS
+      env:
+        SSH_PRIVATE_KEY: ${{ inputs.ssh_private_key }}
+      run: |
+        echo "$SSH_PRIVATE_KEY" > private_key.pem
+        chmod 600 private_key.pem
+        ssh -i private_key.pem -o StrictHostKeyChecking=no ${{ inputs.ssh_username }}@${{ inputs.ssh_host }} << EOF
+          docker pull ${{ inputs.docker_image_name }}:latest
+          docker stop azta-bot || true
+          docker rm azta-bot || true
+          docker run -d --name azta-bot ${{ inputs.docker_image_name }}:latest
+        EOF
+        rm -f private_key.pem
+      shell: bash

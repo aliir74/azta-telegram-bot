@@ -4,7 +4,7 @@
     "description": "Azta Telegram Bot",
     "main": "src/bot.ts",
     "scripts": {
-        "start": "node src/bot.ts",
+        "start": "node src/bot.js",
         "dev": "ts-node-dev --respawn --transpile-only src/bot.ts",
         "build": "tsc",
         "test": "jest",

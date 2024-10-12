@@ -9,5 +9,15 @@
     "trailingComma": "none",
     "bracketSpacing": true,
     "jsxBracketSameLine": false,
-    "semi": true
+    "semi": true,
+    "overrides": [
+        {
+            "files": "*.yaml",
+            "options": {
+                "tabWidth": 2,
+                "singleQuote": true,
+                "bracketSpacing": false
+            }
+        }
+    ]
 }
