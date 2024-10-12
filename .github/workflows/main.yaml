@@ -25,7 +25,9 @@ jobs:
         uses: docker/build-push-action@0565240e2d4ab88bba5387d719585280857ece09 # v5.0.0
         with:
           push: true
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/azta-telegram-bot:${{ github.sha }}
+          tags:
+            ${{ secrets.DOCKERHUB_USERNAME }}/azta-telegram-bot:${{ github.sha
+            }}
           file: ./Dockerfile
 
   deploy:
@@ -40,8 +42,8 @@ jobs:
       - name: Deploy to server
         uses: appleboy/ssh-action@master
         with:
-          host: ${{ env.SSH_HOST }}
-          username: ${{ env.SSH_USERNAME }}
+          host: ${{ vars.SSH_HOST }}
+          username: ${{ vars.SSH_USERNAME }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
             docker pull ${{ secrets.DOCKERHUB_USERNAME }}/azta-telegram-bot:${{ github.sha }}
