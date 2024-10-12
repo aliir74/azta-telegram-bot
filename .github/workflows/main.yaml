@@ -8,8 +8,6 @@ on:
 
 jobs:
   build:
-    environment:
-      name: 'Production'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -27,9 +25,7 @@ jobs:
         uses: docker/build-push-action@0565240e2d4ab88bba5387d719585280857ece09 # v5.0.0
         with:
           push: true
-          tags:
-            ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.DOCKER_IMAGE_NAME }}:${{
-            github.sha }}
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/azta-telegram-bot:${{ github.sha }}
           file: ./Dockerfile
 
   deploy:
@@ -48,7 +44,7 @@ jobs:
           username: ${{ env.SSH_USERNAME }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
-            docker pull ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.DOCKER_IMAGE_NAME }}:${{ github.sha }}
+            docker pull ${{ secrets.DOCKERHUB_USERNAME }}/azta-telegram-bot:${{ github.sha }}
             docker stop azta-telegram-bot || true
             docker rm azta-telegram-bot || true
-            docker run -d --name azta-telegram-bot ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.DOCKER_IMAGE_NAME }}:${{ github.sha }}
+            docker run -d --name azta-telegram-bot ${{ secrets.DOCKERHUB_USERNAME }}/azta-telegram-bot:${{ github.sha }}
