@@ -1,19 +1,84 @@
-import { Bot } from "grammy";
+import { Bot, session } from "grammy";
 import { TELEGRAM_BOT_TOKEN } from "./environment";
+import { getSession, MyContext, SessionData, SessionState } from "./session";
+import {
+    HELLO_MESSAGE,
+    START_COMMAND,
+    START_MESSAGE,
+    ENTER_NEW_CUSTOMER_PHONE_MESSAGE,
+    CONFIRMATION_MESSAGE,
+    RESET_MESSAGE,
+    RESET_COMMAND,
+    INVALID_STATE_MESSAGE
+} from "./consts";
+import { storePhoneNumber, validateAdminUser } from "./utils";
+import { addNewCustomer } from "./adminAccount";
+import { confirmButtonKeyboard } from "./keyboards";
+const bot = new Bot<MyContext>(TELEGRAM_BOT_TOKEN);
 
-// Create an instance of the `Bot` class and pass your bot token to it.
-const bot = new Bot(TELEGRAM_BOT_TOKEN);
+bot.use(
+    session({
+        initial: (): SessionData => ({
+            users: {}
+        })
+    })
+);
 
-// You can now register listeners on your bot object `bot`.
-// grammY will call the listeners when users send messages to your bot.
+bot.command(START_COMMAND, (ctx) => ctx.reply(START_MESSAGE));
+bot.command(RESET_COMMAND, (ctx) => {
+    const userId = validateAdminUser(ctx.from?.id.toString() || "");
+    const userState = getSession(ctx.session, userId);
+    userState.state = SessionState.IDLE;
+    ctx.reply(RESET_MESSAGE);
+});
+bot.callbackQuery(`${SessionState.AWAITING_PHONE}:CONFIRM`, (ctx) => {
+    const userId = validateAdminUser(ctx.from?.id.toString() || "");
+    const userState = getSession(ctx.session, userId);
+    if (userState.state == SessionState.AWAITING_CONFIRMATION) {
+        userState.state = SessionState.AWAITING_ADDITION;
+    } else {
+        ctx.reply(INVALID_STATE_MESSAGE);
+        return;
+    }
+    addNewCustomer(userState.phoneNumber);
+});
 
-// Handle the /start command.
-bot.command("start", (ctx) => ctx.reply("Welcome! Up and running."));
-// Handle other messages.
-bot.on("message", (ctx) => ctx.reply("Got another message!"));
+bot.callbackQuery(`${SessionState.AWAITING_PHONE}:CANCEL`, (ctx) => {
+    const userId = validateAdminUser(ctx.from?.id.toString() || "");
+    const userState = getSession(ctx.session, userId);
+    if (userState.state == SessionState.AWAITING_PHONE) {
+        userState.state = SessionState.IDLE;
+    } else {
+        ctx.reply(INVALID_STATE_MESSAGE);
+        return;
+    }
+    ctx.reply(RESET_MESSAGE);
+    ctx.reply(ENTER_NEW_CUSTOMER_PHONE_MESSAGE);
+});
 
-// Now that you specified how to handle messages, you can start your bot.
-// This will connect to the Telegram servers and wait for messages.
+bot.on("message", async (ctx) => {
+    const userId = validateAdminUser(ctx.from?.id.toString());
+    const userState = getSession(ctx.session, userId);
+    const message = ctx.message.text || "";
+    switch (userState.state) {
+        case SessionState.IDLE:
+            ctx.reply(HELLO_MESSAGE);
+            ctx.reply(ENTER_NEW_CUSTOMER_PHONE_MESSAGE);
+            userState.state = SessionState.AWAITING_PHONE;
+            break;
+        case SessionState.AWAITING_PHONE:
+            try {
+                storePhoneNumber(userState, message);
+            } catch (error) {
+                ctx.reply((error as Error).message);
+                return;
+            }
+            ctx.reply(CONFIRMATION_MESSAGE, {
+                reply_markup: confirmButtonKeyboard
+            });
+            userState.state = SessionState.AWAITING_CONFIRMATION;
+            break;
+    }
+});
 
-// Start the bot.
 bot.start();
