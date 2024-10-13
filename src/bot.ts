@@ -31,7 +31,7 @@ bot.command(RESET_COMMAND, (ctx) => {
     userState.state = SessionState.IDLE;
     ctx.reply(RESET_MESSAGE);
 });
-bot.callbackQuery(`${SessionState.AWAITING_PHONE}:CONFIRM`, (ctx) => {
+bot.callbackQuery(`${SessionState.AWAITING_PHONE}_CONFIRM`, (ctx) => {
     const userId = validateAdminUser(ctx.from?.id.toString() || "");
     const userState = getSession(ctx.session, userId);
     if (userState.state == SessionState.AWAITING_CONFIRMATION) {
@@ -43,7 +43,7 @@ bot.callbackQuery(`${SessionState.AWAITING_PHONE}:CONFIRM`, (ctx) => {
     addNewCustomer(userState.phoneNumber);
 });
 
-bot.callbackQuery(`${SessionState.AWAITING_PHONE}:CANCEL`, (ctx) => {
+bot.callbackQuery(`${SessionState.AWAITING_PHONE}_CANCEL`, (ctx) => {
     const userId = validateAdminUser(ctx.from?.id.toString() || "");
     const userState = getSession(ctx.session, userId);
     if (userState.state == SessionState.AWAITING_PHONE) {
