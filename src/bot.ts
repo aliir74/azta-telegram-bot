@@ -12,9 +12,10 @@ import {
     INVALID_STATE_MESSAGE
 } from "./consts";
 import { storePhoneNumber, validateAdminUser } from "./utils";
-import { addNewCustomer } from "./adminAccount";
 import {
     confirmButtonKeyboard,
+    handleConfirmButton,
+    handleCancelButton,
     CONFIRM_CALLBACK_QUERY,
     CANCEL_CALLBACK_QUERY
 } from "./keyboards";
@@ -39,32 +40,17 @@ bot.command(RESET_COMMAND, (ctx) => {
 
 // Callback queries
 bot.on("callback_query:data", (ctx) => {
-    console.log("Unknown button event with payload", ctx.callbackQuery.data);
-});
-bot.callbackQuery(CONFIRM_CALLBACK_QUERY, (ctx) => {
-    console.log("Confirm button event");
-    const userId = validateAdminUser(ctx.from?.id.toString() || "");
-    const userState = getSession(ctx.session, userId);
-    if (userState.state == SessionState.AWAITING_CONFIRMATION) {
-        userState.state = SessionState.AWAITING_ADDITION;
-    } else {
-        ctx.reply(INVALID_STATE_MESSAGE);
-        return;
+    switch (ctx.callbackQuery.data) {
+        case CONFIRM_CALLBACK_QUERY:
+            handleConfirmButton(ctx);
+            break;
+        case CANCEL_CALLBACK_QUERY:
+            handleCancelButton(ctx);
+            break;
+        default:
+            ctx.reply(INVALID_STATE_MESSAGE);
+            break;
     }
-    addNewCustomer(userState.phoneNumber);
-});
-bot.callbackQuery(CANCEL_CALLBACK_QUERY, (ctx) => {
-    console.log("Cancel button event");
-    const userId = validateAdminUser(ctx.from?.id.toString() || "");
-    const userState = getSession(ctx.session, userId);
-    if (userState.state == SessionState.AWAITING_PHONE) {
-        userState.state = SessionState.IDLE;
-    } else {
-        ctx.reply(INVALID_STATE_MESSAGE);
-        return;
-    }
-    ctx.reply(RESET_MESSAGE);
-    ctx.reply(ENTER_NEW_CUSTOMER_PHONE_MESSAGE);
 });
 
 // Messages
