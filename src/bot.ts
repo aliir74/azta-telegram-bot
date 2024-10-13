@@ -33,25 +33,25 @@ bot.use(
 );
 
 // Commands
-bot.command(START_COMMAND, (ctx) => ctx.reply(START_MESSAGE));
-bot.command(RESET_COMMAND, (ctx) => {
+bot.command(START_COMMAND, async (ctx) => await ctx.reply(START_MESSAGE));
+bot.command(RESET_COMMAND, async (ctx) => {
     const userId = validateAdminUser(ctx.from?.id.toString() || "");
     const userState = getSession(ctx.session, userId);
     userState.state = SessionState.IDLE;
-    ctx.reply(RESET_MESSAGE);
+    await ctx.reply(RESET_MESSAGE);
 });
 
 // Callback queries
-bot.on("callback_query:data", (ctx) => {
+bot.on("callback_query:data", async (ctx) => {
     switch (ctx.callbackQuery.data) {
         case CONFIRM_CALLBACK_QUERY:
-            handleConfirmButton(ctx);
+            await handleConfirmButton(ctx);
             break;
         case CANCEL_CALLBACK_QUERY:
-            handleCancelButton(ctx);
+            await handleCancelButton(ctx);
             break;
         default:
-            ctx.reply(INVALID_STATE_MESSAGE);
+            await ctx.reply(INVALID_STATE_MESSAGE);
             break;
     }
 });
@@ -63,18 +63,18 @@ bot.on("message", async (ctx) => {
     const message = ctx.message.text || "";
     switch (userState.state) {
         case SessionState.IDLE:
-            ctx.reply(HELLO_MESSAGE);
-            ctx.reply(ENTER_NEW_CUSTOMER_PHONE_MESSAGE);
+            await ctx.reply(HELLO_MESSAGE);
+            await ctx.reply(ENTER_NEW_CUSTOMER_PHONE_MESSAGE);
             userState.state = SessionState.AWAITING_PHONE;
             break;
         case SessionState.AWAITING_PHONE:
             try {
                 storePhoneNumber(userState, message);
             } catch (error) {
-                ctx.reply((error as Error).message);
+                await ctx.reply((error as Error).message);
                 return;
             }
-            ctx.reply(CONFIRMATION_MESSAGE, {
+            await ctx.reply(CONFIRMATION_MESSAGE, {
                 reply_markup: confirmButtonKeyboard
             });
             userState.state = SessionState.AWAITING_CONFIRMATION;

@@ -8,7 +8,7 @@ import {
     ENTER_NEW_CUSTOMER_PHONE_MESSAGE
 } from "./consts";
 import { validateAdminUser } from "./utils";
-import { addNewCustomer } from "./adminAccount";
+import { addNewCustomer } from "./telegramClient";
 export const CONFIRM_CALLBACK_QUERY = "confirm";
 export const CANCEL_CALLBACK_QUERY = "cancel";
 const labelDataPairs = [
@@ -20,28 +20,28 @@ const buttonRow = labelDataPairs.map(([text, query]) =>
 );
 export const confirmButtonKeyboard = InlineKeyboard.from([buttonRow]);
 
-export const handleConfirmButton = (ctx: MyContext) => {
+export const handleConfirmButton = async (ctx: MyContext) => {
     console.log("Confirm button event");
     const userId = validateAdminUser(ctx.from?.id.toString() || "");
     const userState = getSession(ctx.session, userId);
     if (userState.state == SessionState.AWAITING_CONFIRMATION) {
         userState.state = SessionState.AWAITING_ADDITION;
     } else {
-        ctx.reply(INVALID_STATE_MESSAGE);
+        await ctx.reply(INVALID_STATE_MESSAGE);
         return;
     }
-    addNewCustomer(userState.phoneNumber);
+    await addNewCustomer(userState.phoneNumber);
 };
 
-export const handleCancelButton = (ctx: MyContext) => {
+export const handleCancelButton = async (ctx: MyContext) => {
     console.log("Cancel button event");
     const userId = validateAdminUser(ctx.from?.id.toString() || "");
     const userState = getSession(ctx.session, userId);
     if (userState.state == SessionState.AWAITING_CONFIRMATION) {
         userState.state = SessionState.AWAITING_PHONE;
     } else {
-        ctx.reply(INVALID_STATE_MESSAGE);
+        await ctx.reply(INVALID_STATE_MESSAGE);
         return;
     }
-    ctx.reply(ENTER_NEW_CUSTOMER_PHONE_MESSAGE);
+    await ctx.reply(ENTER_NEW_CUSTOMER_PHONE_MESSAGE);
 };
