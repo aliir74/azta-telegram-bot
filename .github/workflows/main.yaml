@@ -64,9 +64,9 @@ jobs:
             sed -i 's|image: github_action_replacement|image: ${{ secrets.DOCKERHUB_USERNAME }}/azta-telegram-bot:${{ github.sha }}|' docker-compose.yml
 
             # Create or update environment file
-            touch azta-telegram-bot.env
-            echo "${{ vars.ENVS }}" > azta-telegram-bot.env
-            echo "${{ secrets.ENVS }}" >> azta-telegram-bot.env
+            touch .env
+            echo "${{ vars.ENVS }}" > .env
+            echo "${{ secrets.ENVS }}" >> .env
 
             # Deploy using docker compose
             docker compose up -d --remove-orphans
