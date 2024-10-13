@@ -49,11 +49,11 @@ jobs:
             docker pull ${{ secrets.DOCKERHUB_USERNAME }}/azta-telegram-bot:${{ github.sha }}
             docker stop azta-telegram-bot || true
             docker rm azta-telegram-bot || true
-            touch .env
-            echo "${{ vars.ENVS }}" >> .env
-            echo "\n" >> .env
-            echo "${{ secrets.ENVS }}" >> .env
+            touch azta-telegram-bot.env
+            echo "${{ vars.ENVS }}" > azta-telegram-bot.env
+            echo "\n" >> azta-telegram-bot.env
+            echo "${{ secrets.ENVS }}" >> azta-telegram-bot.env
             docker run -d --name azta-telegram-bot \
-              --env-file .env \
+              --env-file azta-telegram-bot.env \
               --restart unless-stopped \
               ${{ secrets.DOCKERHUB_USERNAME }}/azta-telegram-bot:${{ github.sha }}
