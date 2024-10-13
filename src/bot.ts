@@ -74,9 +74,12 @@ bot.on("message", async (ctx) => {
                 await ctx.reply((error as Error).message);
                 return;
             }
-            await ctx.reply(CONFIRMATION_MESSAGE, {
-                reply_markup: confirmButtonKeyboard
-            });
+            await ctx.reply(
+                `${CONFIRMATION_MESSAGE}: ${userState.phoneNumber}`,
+                {
+                    reply_markup: confirmButtonKeyboard
+                }
+            );
             userState.state = SessionState.AWAITING_CONFIRMATION;
             break;
     }
