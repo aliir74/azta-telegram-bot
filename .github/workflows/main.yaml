@@ -62,5 +62,5 @@ jobs:
             echo "\n" >> azta-telegram-bot.env
             echo "${{ secrets.ENVS }}" >> azta-telegram-bot.env
             
-            # Deploy using docker-compose
-            docker-compose up -d --remove-orphans
+            # Deploy using docker compose
+            docker compose up -d --remove-orphans
