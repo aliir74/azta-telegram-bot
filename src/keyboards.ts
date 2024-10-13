@@ -37,7 +37,7 @@ export const handleCancelButton = (ctx: MyContext) => {
     console.log("Cancel button event");
     const userId = validateAdminUser(ctx.from?.id.toString() || "");
     const userState = getSession(ctx.session, userId);
-    if (userState.state == SessionState.AWAITING_PHONE) {
+    if (userState.state == SessionState.AWAITING_CONFIRMATION) {
         userState.state = SessionState.IDLE;
     } else {
         ctx.reply(INVALID_STATE_MESSAGE);
