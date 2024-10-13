@@ -1,7 +1,8 @@
 import * as dotenv from "dotenv";
 import * as path from "path";
 
-dotenv.config({ path: path.join(__dirname, "..", ".env") });
+dotenv.config({ path: path.join(__dirname, "..", ".env") }); // For local development
+dotenv.config({ path: path.join(__dirname, ".", ".env") }); // For docker
 
 export const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN ?? "";
 
