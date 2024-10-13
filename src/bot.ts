@@ -12,8 +12,13 @@ import {
     INVALID_STATE_MESSAGE
 } from "./consts";
 import { storePhoneNumber, validateAdminUser } from "./utils";
-import { addNewCustomer } from "./adminAccount";
-import { confirmButtonKeyboard } from "./keyboards";
+import {
+    confirmButtonKeyboard,
+    handleConfirmButton,
+    handleCancelButton,
+    CONFIRM_CALLBACK_QUERY,
+    CANCEL_CALLBACK_QUERY
+} from "./keyboards";
 const bot = new Bot<MyContext>(TELEGRAM_BOT_TOKEN);
 
 bot.use(
@@ -24,6 +29,7 @@ bot.use(
     })
 );
 
+// Commands
 bot.command(START_COMMAND, (ctx) => ctx.reply(START_MESSAGE));
 bot.command(RESET_COMMAND, (ctx) => {
     const userId = validateAdminUser(ctx.from?.id.toString() || "");
@@ -31,31 +37,23 @@ bot.command(RESET_COMMAND, (ctx) => {
     userState.state = SessionState.IDLE;
     ctx.reply(RESET_MESSAGE);
 });
-bot.callbackQuery(`${SessionState.AWAITING_PHONE}_CONFIRM`, (ctx) => {
-    const userId = validateAdminUser(ctx.from?.id.toString() || "");
-    const userState = getSession(ctx.session, userId);
-    if (userState.state == SessionState.AWAITING_CONFIRMATION) {
-        userState.state = SessionState.AWAITING_ADDITION;
-    } else {
-        ctx.reply(INVALID_STATE_MESSAGE);
-        return;
+
+// Callback queries
+bot.on("callback_query:data", (ctx) => {
+    switch (ctx.callbackQuery.data) {
+        case CONFIRM_CALLBACK_QUERY:
+            handleConfirmButton(ctx);
+            break;
+        case CANCEL_CALLBACK_QUERY:
+            handleCancelButton(ctx);
+            break;
+        default:
+            ctx.reply(INVALID_STATE_MESSAGE);
+            break;
     }
-    addNewCustomer(userState.phoneNumber);
 });
 
-bot.callbackQuery(`${SessionState.AWAITING_PHONE}_CANCEL`, (ctx) => {
-    const userId = validateAdminUser(ctx.from?.id.toString() || "");
-    const userState = getSession(ctx.session, userId);
-    if (userState.state == SessionState.AWAITING_PHONE) {
-        userState.state = SessionState.IDLE;
-    } else {
-        ctx.reply(INVALID_STATE_MESSAGE);
-        return;
-    }
-    ctx.reply(RESET_MESSAGE);
-    ctx.reply(ENTER_NEW_CUSTOMER_PHONE_MESSAGE);
-});
-
+// Messages
 bot.on("message", async (ctx) => {
     const userId = validateAdminUser(ctx.from?.id.toString());
     const userState = getSession(ctx.session, userId);
