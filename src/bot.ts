@@ -28,6 +28,7 @@ bot.use(
     })
 );
 
+// Commands
 bot.command(START_COMMAND, (ctx) => ctx.reply(START_MESSAGE));
 bot.command(RESET_COMMAND, (ctx) => {
     const userId = validateAdminUser(ctx.from?.id.toString() || "");
@@ -35,6 +36,8 @@ bot.command(RESET_COMMAND, (ctx) => {
     userState.state = SessionState.IDLE;
     ctx.reply(RESET_MESSAGE);
 });
+
+// Callback queries
 bot.callbackQuery(CONFIRM_CALLBACK_QUERY, (ctx) => {
     const userId = validateAdminUser(ctx.from?.id.toString() || "");
     const userState = getSession(ctx.session, userId);
@@ -46,7 +49,6 @@ bot.callbackQuery(CONFIRM_CALLBACK_QUERY, (ctx) => {
     }
     addNewCustomer(userState.phoneNumber);
 });
-
 bot.callbackQuery(CANCEL_CALLBACK_QUERY, (ctx) => {
     const userId = validateAdminUser(ctx.from?.id.toString() || "");
     const userState = getSession(ctx.session, userId);
@@ -60,6 +62,7 @@ bot.callbackQuery(CANCEL_CALLBACK_QUERY, (ctx) => {
     ctx.reply(ENTER_NEW_CUSTOMER_PHONE_MESSAGE);
 });
 
+// Messages
 bot.on("message", async (ctx) => {
     const userId = validateAdminUser(ctx.from?.id.toString());
     const userState = getSession(ctx.session, userId);
