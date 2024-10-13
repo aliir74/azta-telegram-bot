@@ -38,11 +38,10 @@ export const handleCancelButton = (ctx: MyContext) => {
     const userId = validateAdminUser(ctx.from?.id.toString() || "");
     const userState = getSession(ctx.session, userId);
     if (userState.state == SessionState.AWAITING_CONFIRMATION) {
-        userState.state = SessionState.IDLE;
+        userState.state = SessionState.AWAITING_PHONE;
     } else {
         ctx.reply(INVALID_STATE_MESSAGE);
         return;
     }
-    ctx.reply(RESET_MESSAGE);
     ctx.reply(ENTER_NEW_CUSTOMER_PHONE_MESSAGE);
 };
