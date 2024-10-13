@@ -1,9 +1,9 @@
 name: Deploy Azta Telegram Bot
 
 on:
-  # push:
-  #   branches:
-  #     - main
+  push:
+    branches:
+      - main
   workflow_dispatch:
 
 jobs:
@@ -39,11 +39,6 @@ jobs:
       name: 'Production'
 
     steps:
-      - name: Create .env file
-        run: |
-          echo ${{ vars.ENVS }} >> .env
-          scp .env ${{ vars.SSH_USERNAME }}@${{ vars.SSH_HOST }}:/home/root/azta-telegram-bot/.env
-
       - name: Deploy to server
         uses: appleboy/ssh-action@master
         with:
@@ -55,5 +50,6 @@ jobs:
             docker stop azta-telegram-bot || true
             docker rm azta-telegram-bot || true
             docker run -d --name azta-telegram-bot \
-              --env-file /home/root/azta-telegram-bot/.env \
+              $(echo "${{ vars.ENVS }}" | sed 's/^/-e /' | tr '\n' ' ') \
+              $(echo "${{ secrets.ENVS }}" | sed 's/^/-e /' | tr '\n' ' ') \
               ${{ secrets.DOCKERHUB_USERNAME }}/azta-telegram-bot:${{ github.sha }}
