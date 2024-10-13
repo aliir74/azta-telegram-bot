@@ -1,19 +1,17 @@
 services:
-    bot:
-        image:
-            ${{ secrets.DOCKERHUB_USERNAME }}/azta-telegram-bot:${{ github.sha
-            }}
-        restart: unless-stopped
-        depends_on:
-            - redis
+  bot:
+    image: ${{ secrets.DOCKERHUB_USERNAME }}/azta-telegram-bot:${{ github.sha }}
+    restart: unless-stopped
+    depends_on:
+      - redis
 
-    redis:
-        image: redis:alpine
-        restart: unless-stopped
-        ports:
-            - "6379:6379"
-        volumes:
-            - redis-data:/data
+  redis:
+    image: redis:alpine
+    restart: unless-stopped
+    ports:
+      - '6379:6379'
+    volumes:
+      - redis-data:/data
 
 volumes:
-    redis-data:
+  redis-data:
