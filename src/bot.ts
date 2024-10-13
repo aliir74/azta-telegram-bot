@@ -42,6 +42,7 @@ bot.on("callback_query:data", (ctx) => {
     console.log("Unknown button event with payload", ctx.callbackQuery.data);
 });
 bot.callbackQuery(CONFIRM_CALLBACK_QUERY, (ctx) => {
+    console.log("Confirm button event");
     const userId = validateAdminUser(ctx.from?.id.toString() || "");
     const userState = getSession(ctx.session, userId);
     if (userState.state == SessionState.AWAITING_CONFIRMATION) {
@@ -53,6 +54,7 @@ bot.callbackQuery(CONFIRM_CALLBACK_QUERY, (ctx) => {
     addNewCustomer(userState.phoneNumber);
 });
 bot.callbackQuery(CANCEL_CALLBACK_QUERY, (ctx) => {
+    console.log("Cancel button event");
     const userId = validateAdminUser(ctx.from?.id.toString() || "");
     const userState = getSession(ctx.session, userId);
     if (userState.state == SessionState.AWAITING_PHONE) {
