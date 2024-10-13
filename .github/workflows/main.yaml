@@ -46,14 +46,21 @@ jobs:
           username: ${{ vars.SSH_USERNAME }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
+            # Pull the latest image
             docker pull ${{ secrets.DOCKERHUB_USERNAME }}/azta-telegram-bot:${{ github.sha }}
-            docker stop azta-telegram-bot || true
-            docker rm azta-telegram-bot || true
+            
+            # Clone the repository to get the docker-compose file
+            git clone https://github.com/${{ github.repository }}.git azta-telegram-bot
+            cd azta-telegram-bot
+            
+            # Update the image tag in the docker-compose file
+            sed -i 's|image: .*|image: ${{ secrets.DOCKERHUB_USERNAME }}/azta-telegram-bot:${{ github.sha }}|' docker-compose.yml
+            
+            # Create or update environment file
             touch azta-telegram-bot.env
             echo "${{ vars.ENVS }}" > azta-telegram-bot.env
             echo "\n" >> azta-telegram-bot.env
             echo "${{ secrets.ENVS }}" >> azta-telegram-bot.env
-            docker run -d --name azta-telegram-bot \
-              --env-file azta-telegram-bot.env \
-              --restart unless-stopped \
-              ${{ secrets.DOCKERHUB_USERNAME }}/azta-telegram-bot:${{ github.sha }}
+            
+            # Deploy using docker-compose
+            docker-compose up -d --remove-orphans
