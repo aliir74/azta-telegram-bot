@@ -50,8 +50,9 @@ jobs:
             docker stop azta-telegram-bot || true
             docker rm azta-telegram-bot || true
             touch .env
-            $(echo "${{ vars.ENVS }}" | sed 's/^/-e /' | tr '\n' ' ') >> .env
-            $(echo "${{ secrets.ENVS }}" | sed 's/^/-e /' | tr '\n' ' ') >> .env
+            echo ${{ vars.ENVS }} >> .env
+            echo "\n" >> .env
+            echo ${{ secrets.ENVS }} >> .env
             docker run -d --name azta-telegram-bot \
               --env-file .env \
               --restart unless-stopped \
