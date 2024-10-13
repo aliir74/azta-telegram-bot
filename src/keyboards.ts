@@ -26,7 +26,7 @@ export const confirmButtonKeyboard = InlineKeyboard.from([buttonRow]);
 
 export const handleConfirmButton = async (ctx: MyContext) => {
     console.log("Confirm button event");
-    const userId = validateAdminUser(ctx.from?.id.toString() || "");
+    const userId = ctx.from?.id.toString() || "";
     const userState = getSession(ctx.session, userId);
     if (userState.state == SessionState.AWAITING_CONFIRMATION) {
         await ctx.reply(ADDING_CUSTOMER_MESSAGE);
@@ -51,7 +51,7 @@ export const handleConfirmButton = async (ctx: MyContext) => {
 
 export const handleCancelButton = async (ctx: MyContext) => {
     console.log("Cancel button event");
-    const userId = validateAdminUser(ctx.from?.id.toString() || "");
+    const userId = ctx.from?.id.toString() || "";
     const userState = getSession(ctx.session, userId);
     if (userState.state == SessionState.AWAITING_CONFIRMATION) {
         userState.state = SessionState.AWAITING_PHONE;

@@ -9,7 +9,8 @@ import {
     CONFIRMATION_MESSAGE,
     RESET_MESSAGE,
     RESET_COMMAND,
-    INVALID_STATE_MESSAGE
+    INVALID_STATE_MESSAGE,
+    NOT_AUTHORIZED_MESSAGE
 } from "./consts";
 import { storePhoneNumber, validateAdminUser } from "./utils";
 import {
@@ -31,11 +32,24 @@ bot.use(
         storage: storage
     })
 );
+bot.use((ctx, next) => {
+    if (validateAdminUser(ctx.from?.id.toString() || "")) {
+        return next();
+    }
+    return ctx.reply(NOT_AUTHORIZED_MESSAGE);
+});
 
 // Commands
-bot.command(START_COMMAND, async (ctx) => await ctx.reply(START_MESSAGE));
+
+bot.command(START_COMMAND, async (ctx) => {
+    await ctx.reply(HELLO_MESSAGE);
+    await ctx.reply(ENTER_NEW_CUSTOMER_PHONE_MESSAGE);
+    const userId = ctx.from?.id.toString() ?? "";
+    const userState = getSession(ctx.session, userId);
+    userState.state = SessionState.AWAITING_PHONE;
+});
 bot.command(RESET_COMMAND, async (ctx) => {
-    const userId = validateAdminUser(ctx.from?.id.toString() || "");
+    const userId = ctx.from?.id.toString() ?? "";
     const userState = getSession(ctx.session, userId);
     userState.state = SessionState.IDLE;
     await ctx.reply(RESET_MESSAGE);
@@ -58,7 +72,7 @@ bot.on("callback_query:data", async (ctx) => {
 
 // Messages
 bot.on("message", async (ctx) => {
-    const userId = validateAdminUser(ctx.from?.id.toString());
+    const userId = ctx.from?.id.toString();
     const userState = getSession(ctx.session, userId);
     const message = ctx.message.text || "";
     switch (userState.state) {
