@@ -19,13 +19,16 @@ import {
     CONFIRM_CALLBACK_QUERY,
     CANCEL_CALLBACK_QUERY
 } from "./keyboards";
+import { storage } from "./redis";
+
 const bot = new Bot<MyContext>(TELEGRAM_BOT_TOKEN);
 
 bot.use(
     session({
         initial: (): SessionData => ({
             users: {}
-        })
+        }),
+        storage: storage
     })
 );
 
