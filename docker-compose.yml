@@ -1,6 +1,6 @@
 services:
   bot:
-    image: ${{ secrets.DOCKERHUB_USERNAME }}/azta-telegram-bot:${{ github.sha }}
+    image: github_action_replacement
     restart: unless-stopped
     depends_on:
       - redis
