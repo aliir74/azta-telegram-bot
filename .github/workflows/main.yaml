@@ -49,9 +49,15 @@ jobs:
             # Pull the latest image
             docker pull ${{ secrets.DOCKERHUB_USERNAME }}/azta-telegram-bot:${{ github.sha }}
             
-            # Clone the repository to get the docker-compose file
-            git clone https://github.com/${{ github.repository }}.git azta-telegram-bot
-            cd azta-telegram-bot
+            # Check if the repository folder exists, if not clone it, otherwise fetch and checkout the specific commit
+            if [ ! -d "azta-telegram-bot" ]; then
+              git clone https://github.com/${{ github.repository }}.git azta-telegram-bot
+              cd azta-telegram-bot
+            else
+              cd azta-telegram-bot
+              git fetch origin
+            fi
+            git checkout ${{ github.sha }}
             
             # Update the image tag in the docker-compose file
             sed -i 's|image: .*|image: ${{ secrets.DOCKERHUB_USERNAME }}/azta-telegram-bot:${{ github.sha }}|' docker-compose.yml
