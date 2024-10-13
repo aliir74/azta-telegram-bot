@@ -57,6 +57,7 @@ jobs:
               cd azta-telegram-bot
               git fetch origin
             fi
+            git stash
             git checkout ${{ github.sha }}
 
             # Update the image tag in the docker-compose file
