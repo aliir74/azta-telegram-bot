@@ -5,7 +5,9 @@ import {
     CANCEL_BUTTON_TEXT,
     INVALID_STATE_MESSAGE,
     RESET_MESSAGE,
-    ENTER_NEW_CUSTOMER_PHONE_MESSAGE
+    ENTER_NEW_CUSTOMER_PHONE_MESSAGE,
+    ADDED_TO_GROUP_MESSAGE,
+    ADDING_CUSTOMER_MESSAGE
 } from "./consts";
 import { validateAdminUser } from "./utils";
 import { addNewCustomer } from "./telegramClient";
@@ -25,12 +27,16 @@ export const handleConfirmButton = async (ctx: MyContext) => {
     const userId = validateAdminUser(ctx.from?.id.toString() || "");
     const userState = getSession(ctx.session, userId);
     if (userState.state == SessionState.AWAITING_CONFIRMATION) {
+        await ctx.reply(ADDING_CUSTOMER_MESSAGE);
         userState.state = SessionState.AWAITING_ADDITION;
     } else {
         await ctx.reply(INVALID_STATE_MESSAGE);
         return;
     }
+
     await addNewCustomer(userState.phoneNumber);
+    await ctx.reply(`${userState.phoneNumber}: ${ADDED_TO_GROUP_MESSAGE}`);
+    userState.state = SessionState.IDLE;
 };
 
 export const handleCancelButton = async (ctx: MyContext) => {
