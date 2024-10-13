@@ -13,7 +13,11 @@ import {
 } from "./consts";
 import { storePhoneNumber, validateAdminUser } from "./utils";
 import { addNewCustomer } from "./adminAccount";
-import { confirmButtonKeyboard } from "./keyboards";
+import {
+    confirmButtonKeyboard,
+    CONFIRM_CALLBACK_QUERY,
+    CANCEL_CALLBACK_QUERY
+} from "./keyboards";
 const bot = new Bot<MyContext>(TELEGRAM_BOT_TOKEN);
 
 bot.use(
@@ -31,7 +35,7 @@ bot.command(RESET_COMMAND, (ctx) => {
     userState.state = SessionState.IDLE;
     ctx.reply(RESET_MESSAGE);
 });
-bot.callbackQuery(`${SessionState.AWAITING_PHONE}_CONFIRM`, (ctx) => {
+bot.callbackQuery(CONFIRM_CALLBACK_QUERY, (ctx) => {
     const userId = validateAdminUser(ctx.from?.id.toString() || "");
     const userState = getSession(ctx.session, userId);
     if (userState.state == SessionState.AWAITING_CONFIRMATION) {
@@ -43,7 +47,7 @@ bot.callbackQuery(`${SessionState.AWAITING_PHONE}_CONFIRM`, (ctx) => {
     addNewCustomer(userState.phoneNumber);
 });
 
-bot.callbackQuery(`${SessionState.AWAITING_PHONE}_CANCEL`, (ctx) => {
+bot.callbackQuery(CANCEL_CALLBACK_QUERY, (ctx) => {
     const userId = validateAdminUser(ctx.from?.id.toString() || "");
     const userState = getSession(ctx.session, userId);
     if (userState.state == SessionState.AWAITING_PHONE) {
