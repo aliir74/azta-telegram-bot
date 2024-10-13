@@ -2,6 +2,8 @@ services:
   bot:
     image: github_action_replacement
     restart: unless-stopped
+    env_file:
+      - azta-telegram-bot.env
     depends_on:
       - redis
 
