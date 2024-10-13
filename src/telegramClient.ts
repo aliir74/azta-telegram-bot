@@ -17,10 +17,17 @@ const tgClient = new TelegramClient(
 export async function addNewCustomer(phoneNumber: string) {
     console.log(`Adding new customer with phone number: ${phoneNumber}`);
     await tgClient.connect();
-    await tgClient.invoke(
+    const result: any = await tgClient.invoke(
         new Api.channels.InviteToChannel({
             channel: GROUP_CHAT_ID,
             users: [phoneNumber]
         })
     );
+    if (result.updates?.updates?.length > 0) {
+        console.log("User added to channel");
+        return true;
+    } else {
+        console.log("User not added to channel");
+        return false;
+    }
 }

@@ -16,3 +16,5 @@ export const TELEGRAM_API_HASH = process.env.TELEGRAM_API_HASH ?? "";
 
 export const TELEGRAM_SESSION_STRING =
     process.env.TELEGRAM_SESSION_STRING ?? "";
+
+export const TELEGRAM_INVITE_LINK = process.env.TELEGRAM_INVITE_LINK ?? "";

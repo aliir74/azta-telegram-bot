@@ -1,16 +1,18 @@
-import { Context, InlineKeyboard } from "grammy";
+import { InlineKeyboard } from "grammy";
 import { getSession, SessionState, MyContext } from "./session";
 import {
     CONFIRM_BUTTON_TEXT,
     CANCEL_BUTTON_TEXT,
     INVALID_STATE_MESSAGE,
-    RESET_MESSAGE,
     ENTER_NEW_CUSTOMER_PHONE_MESSAGE,
     ADDED_TO_GROUP_MESSAGE,
-    ADDING_CUSTOMER_MESSAGE
+    FAILED_TO_ADD_TO_GROUP_MESSAGE,
+    ADDING_CUSTOMER_MESSAGE,
+    SENDING_INVITE_MESSAGE
 } from "./consts";
 import { validateAdminUser } from "./utils";
 import { addNewCustomer } from "./telegramClient";
+import { TELEGRAM_INVITE_LINK } from "./environment";
 export const CONFIRM_CALLBACK_QUERY = "confirm";
 export const CANCEL_CALLBACK_QUERY = "cancel";
 const labelDataPairs = [
@@ -34,8 +36,16 @@ export const handleConfirmButton = async (ctx: MyContext) => {
         return;
     }
 
-    await addNewCustomer(userState.phoneNumber);
-    await ctx.reply(`${userState.phoneNumber}: ${ADDED_TO_GROUP_MESSAGE}`);
+    const added = await addNewCustomer(userState.phoneNumber);
+    if (added) {
+        await ctx.reply(`${userState.phoneNumber}: ${ADDED_TO_GROUP_MESSAGE}`);
+    } else {
+        await ctx.reply(
+            `${userState.phoneNumber}: ${FAILED_TO_ADD_TO_GROUP_MESSAGE}`
+        );
+        await ctx.reply(SENDING_INVITE_MESSAGE);
+        await ctx.reply(TELEGRAM_INVITE_LINK);
+    }
     userState.state = SessionState.IDLE;
 };
 
