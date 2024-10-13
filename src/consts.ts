@@ -1,15 +1,19 @@
 export const START_COMMAND = "start";
 export const RESET_COMMAND = "reset";
 export const START_MESSAGE = "سلام! خوش اومدی 🤖️️️️😁";
-export const NOT_AUTHORIZED_MESSAGE = "🛑شما اجازه استفاده از این ربات را ندارید.";
+export const NOT_AUTHORIZED_MESSAGE =
+    "🛑شما اجازه استفاده از این ربات را ندارید.";
 export const HELLO_MESSAGE = "سلام! خوش اومدی 🤖️️️️😁";
 export const ENTER_NEW_CUSTOMER_PHONE_MESSAGE =
     "🤔📱لطفا شماره‌ی عضو جدید ماهور رو برام بنویس!";
 export const CONFIRMATION_MESSAGE = "مطمئنی شماره‌ش همینه؟";
 export const ADDED_TO_GROUP_MESSAGE = "به گروه ماهور اضافه شد 🥰";
-export const ADDING_CUSTOMER_MESSAGE = "یه لحظه وایسا... دارم اضافه‌ش می‌کنم...";
-export const SENDING_INVITE_MESSAGE =
+export const ADDING_CUSTOMER_MESSAGE =
+    "یه لحظه وایسا... دارم اضافه‌ش می‌کنم...";
+export const FAILED_TO_ADD_TO_GROUP_MESSAGE =
     "نتونستم اضافه‌ش کنم چون تنظیمات تلگرامش نمی‌ذاره ☹️";
+export const SENDING_INVITE_MESSAGE =
+    "این لینکو براش بفرست که عضو شه 🔗";
 export const CONFIRM_BUTTON_TEXT = "✅آره";
 export const CANCEL_BUTTON_TEXT = "❌نه عوضش کن";
 export const RESET_MESSAGE = "🔄ریست شدم";
